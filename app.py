@@ -23,9 +23,9 @@ from typing import List
 # ============================================================
 
 app = FastAPI(
-    title="Wine Quality API",
+    title="Wine Quality - API",
     description="API REST pentru predictia calitatii vinului folosind Random Forest",
-    version="1.1.0",
+    version="1.3.0",
 )
 
 # Incarcam modelul si feature names UNA SINGURA DATA la pornirea aplicatiei.
