@@ -92,7 +92,7 @@ class PredictionResponse(BaseModel):
 def root():
     """Endpoint informativ - returneaza date despre API."""
     return {
-        "name": "Wine Quality - API",
+        "name": "Wine Quality API",
         "version": "1.3.0",
         "description": "Predictia calitatii vinului folosind Random Forest",
         "endpoints": {
