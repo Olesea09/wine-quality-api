@@ -1,0 +1,63 @@
+# Deployment pentru Wine Quality API
+# Defineste cum K8s gestioneaza Pod-urile aplicatiei
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wine-quality-deployment
+  labels:
+    app: wine-quality-api
+spec:
+  # Numarul de Pod-uri identice care trebuie sa ruleze
+  replicas: 1
+
+  # Cum identifica Deployment-ul Pod-urile care ii apartin
+  selector:
+    matchLabels:
+      app: wine-quality-api
+
+  # Sablonul Pod-urilor create de Deployment
+  template:
+    metadata:
+      labels:
+        app: wine-quality-api
+    spec:
+      containers:
+        - name: wine-quality-container
+          image: wine-quality-api:1.0
+          # IMPORTANT: foloseste imaginea locala, nu incerca sa o descarci
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 8000
+              name: http
+
+          # Limite de resurse pentru container
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+          # Verificari de sanatate folosite de Kubernetes
+          # Liveness: daca esueaza, K8s reporneste containerul
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness: daca esueaza, K8s nu trimite trafic catre acest Pod
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3

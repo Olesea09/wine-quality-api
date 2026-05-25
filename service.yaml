@@ -1,0 +1,25 @@
+# Service pentru Wine Quality API
+# Expune Pod-urile printr-un IP stabil intern in cluster
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wine-quality-service
+  labels:
+    app: wine-quality-api
+spec:
+  # Tip Service: NodePort (accesibil din browser la localhost:30080)
+  type: NodePort
+
+  # Selectorul: ce Pod-uri sunt expuse de acest Service
+  # Trebuie sa se potriveasca cu etichetele Pod-urilor din Deployment
+  selector:
+    app: wine-quality-api
+
+  # Mapping de port-uri
+  ports:
+    - name: http
+      port: 80              # portul Service-ului
+      targetPort: 8000      # portul Pod-ului (containerul asculta pe 8000)
+      nodePort: 30080       # portul accesibil din browser: localhost:30080
+      protocol: TCP

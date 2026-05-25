@@ -1,0 +1,50 @@
+# cloudbuild.yaml — Pipeline CI/CD pentru Wine Quality API
+# Descrie cei 3 pasi automatizati: build, push, deploy
+
+steps:
+  # Pasul 1: Construire imagine Docker
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api:$BUILD_ID'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api:latest'
+      - '.'
+
+  # Pasul 2: Push imagine in Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api'
+
+  # Pasul 3: Deploy pe Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-cloud-run'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'wine-quality-api'
+      - '--image=europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api:$BUILD_ID'
+      - '--region=europe-west1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=8000'
+      - '--memory=512Mi'
+      - '--cpu=1'
+      - '--min-instances=0'
+      - '--max-instances=3'
+
+# Imaginile publicate de build
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api:$BUILD_ID'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/wine-quality-repo/wine-quality-api:latest'
+
+# Optiuni
+options:
+  logging: CLOUD_LOGGING_ONLY
+
