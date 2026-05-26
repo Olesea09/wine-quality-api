@@ -93,7 +93,7 @@ def root():
     """Endpoint informativ - returneaza date despre API."""
     return {
         "name": "Wine Quality API",
-        "version": "1.3.0",
+        "version": "1.5.0",
         "description": "Predictia calitatii vinului folosind Random Forest",
         "endpoints": {
             "GET /": "Aceste informatii",
